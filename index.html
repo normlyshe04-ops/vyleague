@@ -1,145 +1,785 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VYLEAGUE - SYSTEM BROADCAST</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #000; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden;
-            font-family: 'Courier New', monospace;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYLEAGUE — ILLEGAL BROADCAST</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
 
-        /* FRAME TV VYLEAGUE */
-        .tv-case {
-            position: relative;
-            width: 95vw; 
-            max-width: 600px;
-            background-image: url('https://i.ibb.co.com/mR700Yp/vintage-tv-ref.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
+```
+:root {
+  --red: #ff0000;
+  --cyan: #00ffff;
+  --magenta: #ff00ff;
+  --white: #f0f0f0;
+  --black: #000000;
+}
 
-        .tv-case::before {
-            content: ""; 
-            display: block; 
-            padding-top: 80%;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* AREA LAYAR CRT */
-        .screen-container {
-            position: absolute;
-            top: 19.5%; 
-            left: 18.5%;
-            width: 46%; 
-            height: 47%;
-            background: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            z-index: 5;
-        }
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: crosshair;
+  overflow: hidden;
+}
 
-        /* EFEK STATIC & MAX HEADROOM */
-        .static-noise {
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%;
-            background: url('https://media.giphy.com/media/oEI9uWUPr8YN2/giphy.gif');
-            background-size: cover;
-            opacity: 0.3; 
-            z-index: 8;
-        }
+/* BACKGROUND CYBER GRID */
+.cyber-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1s;
+  background:
+    linear-gradient(rgba(255,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 8s linear infinite;
+}
 
-        .max-broadcast {
-            width: 100%; 
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) contrast(1.2);
-            display: none; 
-            position: relative;
-            z-index: 6;
-        }
+.cyber-grid.active { opacity: 1; }
 
-        /* MENU BUTTONS */
-        .vyleague-menu {
-            position: absolute;
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            display: flex; 
-            flex-direction: column;
-            gap: 8px;
-            width: 85%;
-            z-index: 15;
-            display: none;
-        }
+@keyframes gridMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 40px; }
+}
 
-        .btn {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #ff0000;
-            color: #ff0000;
-            padding: 5px;
-            font-size: 10px;
-            cursor: pointer;
-            text-align: left;
-            text-transform: uppercase;
-        }
+/* SCANLINES GLOBAL */
+.global-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+}
 
-        /* TOMBOL POWER (KNOB KANAN) */
-        .power-knob {
-            position: absolute;
-            bottom: 24%; 
-            right: 14%;
-            width: 15%; 
-            height: 15%;
-            cursor: pointer;
-            z-index: 20;
-        }
-    </style>
+/* TV WRAPPER */
+.tv-wrapper {
+  position: relative;
+  z-index: 10;
+  width: min(90vw, 520px);
+}
+
+/* TV BODY */
+.tv-body {
+  position: relative;
+  background: linear-gradient(145deg, #1a1a1a, #0a0a0a, #111);
+  border-radius: 24px 24px 20px 20px;
+  padding: 28px 28px 60px 28px;
+  box-shadow:
+    0 0 0 2px #222,
+    0 0 0 4px #111,
+    inset 0 2px 4px rgba(255,255,255,0.05),
+    0 20px 60px rgba(0,0,0,0.9),
+    0 0 80px rgba(255,0,0,0.05);
+}
+
+/* SCREEN BEZEL */
+.screen-bezel {
+  background: #050505;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.9),
+    inset 0 0 0 2px #1a1a1a;
+  position: relative;
+}
+
+/* CRT SCREEN */
+.screen {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.8),
+    0 0 20px rgba(0,0,0,0.5);
+}
+
+/* FISHEYE/CRT CURVE EFFECT */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center,
+    transparent 60%,
+    rgba(0,0,0,0.7) 100%
+  );
+  z-index: 50;
+  pointer-events: none;
+  border-radius: 10px;
+}
+
+/* CRT GLASS REFLECTION */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.03) 0%,
+    transparent 50%,
+    rgba(255,255,255,0.01) 100%
+  );
+  z-index: 60;
+  pointer-events: none;
+  border-radius: 10px;
+}
+
+.screen-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* OFF STATE */
+.screen-off {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 40% 35%,
+    rgba(30,30,30,0.4) 0%,
+    #000 70%
+  );
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s;
+}
+
+.screen-off .off-text {
+  font-family: 'VT323', monospace;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.05);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+/* STATIC NOISE */
+.static-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  opacity: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  animation: staticAnim 0.05s steps(1) infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes staticAnim {
+  0% { background-position: 0 0; opacity: 0.8; }
+  25% { background-position: -20px 10px; opacity: 0.6; }
+  50% { background-position: 15px -10px; opacity: 0.9; }
+  75% { background-position: -10px 20px; opacity: 0.7; }
+  100% { background-position: 5px -15px; opacity: 0.8; }
+}
+
+/* SCANLINES ON SCREEN */
+.scanlines-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.3) 3px,
+    rgba(0,0,0,0.3) 4px
+  );
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* BROADCAST CONTENT */
+.broadcast-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.broadcast-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4px,
+      rgba(255,0,0,0.05) 4px,
+      rgba(255,0,0,0.05) 5px
+    ),
+    linear-gradient(180deg, #000 0%, #0a0000 50%, #000 100%);
+  animation: bgPulse 2s ease-in-out infinite;
+}
+
+@keyframes bgPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* MAX HEADROOM FIGURE */
+.max-figure {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  animation: maxFloat 3s ease-in-out infinite;
+}
+
+@keyframes maxFloat {
+  0%, 100% { transform: translateY(0) skewX(0deg); }
+  25% { transform: translateY(-3px) skewX(0.5deg); }
+  75% { transform: translateY(2px) skewX(-0.3deg); }
+}
+
+.max-head {
+  font-family: 'VT323', monospace;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  color: var(--white);
+  line-height: 1;
+  filter: contrast(1.3);
+  text-shadow:
+    2px 0 var(--red),
+    -2px 0 var(--cyan),
+    0 0 10px rgba(255,255,255,0.5);
+  animation: headGlitch 4s steps(1) infinite;
+}
+
+@keyframes headGlitch {
+  0%, 90%, 100% {
+    text-shadow: 2px 0 var(--red), -2px 0 var(--cyan), 0 0 10px rgba(255,255,255,0.5);
+    transform: none;
+  }
+  91% { transform: translateX(3px); text-shadow: -3px 0 var(--red), 3px 0 var(--cyan); }
+  92% { transform: translateX(-3px); text-shadow: 3px 0 var(--magenta), -3px 0 var(--cyan); }
+  93% { transform: translateX(0); }
+  95% { transform: skewX(5deg); }
+  96% { transform: skewX(-5deg) translateX(2px); }
+  97% { transform: none; }
+}
+
+.max-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.7rem, 2.5vw, 1rem);
+  color: var(--red);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: flicker 3s steps(1) infinite;
+  margin-top: 4px;
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0; }
+}
+
+/* MENU OVERLAY */
+.menu-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8% 6% 8%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.menu-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.menu-item {
+  display: block;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,0,0,0.5);
+  color: var(--red);
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  margin: 3px 0;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: left;
+  width: 100%;
+  animation: menuFlicker 5s steps(1) infinite;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item:nth-child(2) { animation-delay: 0.3s; }
+.menu-item:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes menuFlicker {
+  0%, 95%, 100% { opacity: 1; border-color: rgba(255,0,0,0.5); }
+  96% { opacity: 0.3; border-color: rgba(0,255,255,0.5); color: var(--cyan); }
+  97% { opacity: 1; }
+  98% { opacity: 0.6; }
+}
+
+.menu-item:hover {
+  background: rgba(255,0,0,0.15);
+  color: var(--white);
+  border-color: var(--red);
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,0,0,0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+
+.menu-item:hover::before { transform: translateX(100%); }
+
+/* CHROMATIC ABERRATION LAYER */
+.chromatic-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(90deg, rgba(255,0,0,0.03) 0%, transparent 20%, transparent 80%, rgba(0,255,255,0.03) 100%);
+}
+
+/* GLITCH OVERLAY */
+.glitch-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.glitch-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--red);
+  opacity: 0.8;
+  animation: glitchBar 0.1s steps(1) infinite;
+}
+
+@keyframes glitchBar {
+  0% { top: 20%; background: var(--red); }
+  25% { top: 60%; background: var(--cyan); }
+  50% { top: 40%; background: var(--white); }
+  75% { top: 80%; background: var(--magenta); }
+  100% { top: 10%; background: var(--red); }
+}
+
+/* TV BOTTOM CONTROLS */
+.tv-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.control-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* POWER KNOB */
+.power-knob {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2a2a2a, #0a0a0a);
+  border: 2px solid #1a1a1a;
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.8),
+    inset 0 1px 2px rgba(255,255,255,0.05),
+    0 0 0 1px #111;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.power-knob::after {
+  content: '';
+  width: 3px;
+  height: 12px;
+  background: #333;
+  border-radius: 2px;
+  position: absolute;
+  top: 6px;
+}
+
+.power-knob:hover {
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.8),
+    inset 0 1px 2px rgba(255,255,255,0.05),
+    0 0 0 1px #111,
+    0 0 15px rgba(255,0,0,0.3);
+}
+
+.power-knob:active { transform: scale(0.95); }
+.power-knob.on { box-shadow: 0 3px 6px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,0,0.5); }
+
+.vyleague-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #222;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* CHANNEL TAG */
+.channel-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 55;
+  font-family: 'VT323', monospace;
+  font-size: 0.7rem;
+  color: rgba(255,0,0,0.6);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.5s;
+  animation: channelFlicker 4s steps(1) infinite;
+}
+
+@keyframes channelFlicker {
+  0%, 88%, 100% { opacity: 0.6; }
+  89%, 91% { opacity: 0; }
+  90% { opacity: 0.9; }
+}
+
+/* SIGNAL TEXT */
+.signal-text {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 55;
+  font-family: 'VT323', monospace;
+  font-size: 0.65rem;
+  color: rgba(255,0,0,0.5);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* STARTUP GLITCH */
+@keyframes startupGlitch {
+  0% { transform: scaleX(0); opacity: 0; filter: brightness(3); }
+  10% { transform: scaleX(1.05) scaleY(0.1); opacity: 1; }
+  20% { transform: scaleX(0.98) scaleY(0.5); filter: brightness(2) hue-rotate(90deg); }
+  30% { transform: scaleX(1.02) scaleY(0.8); filter: brightness(1.5); }
+  40% { transform: scaleX(0.99) scaleY(0.95); filter: brightness(1.2) contrast(1.5); }
+  50% { transform: scaleX(1.01) scaleY(1); filter: brightness(1) contrast(1.3); }
+  60% { transform: none; filter: brightness(0.8) contrast(1.5); }
+  70% { transform: translateX(3px); filter: brightness(1.1); }
+  80% { transform: translateX(-2px); }
+  90%, 100% { transform: none; filter: none; }
+}
+
+/* SHUTDOWN */
+@keyframes shutdownAnim {
+  0% { transform: none; opacity: 1; filter: brightness(1); }
+  20% { transform: scaleY(0.1); filter: brightness(2); }
+  40% { transform: scaleY(0.02) scaleX(1.1); filter: brightness(3); }
+  60% { transform: scaleY(0.01) scaleX(0.5); filter: brightness(5); }
+  80% { transform: scaleY(0) scaleX(0); filter: brightness(0); opacity: 0; }
+  100% { transform: scaleY(0); opacity: 0; }
+}
+
+.tv-on .broadcast-layer { animation: startupGlitch 0.8s ease-out forwards; }
+.tv-shutdown .screen-inner { animation: shutdownAnim 0.5s ease-in forwards; }
+
+/* AMBIENT GLOW */
+.tv-body.on {
+  box-shadow:
+    0 0 0 2px #222,
+    0 0 0 4px #111,
+    inset 0 2px 4px rgba(255,255,255,0.05),
+    0 20px 60px rgba(0,0,0,0.9),
+    0 0 60px rgba(255,0,0,0.15),
+    0 0 120px rgba(255,0,0,0.05);
+}
+```
+
+  </style>
 </head>
 <body>
 
-    <div class="tv-case">
-        <div class="screen-container" id="screen">
-            <div class="static-noise" id="noise"></div>
-            
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG56Znd4ZzJ4Nnh4Z3h4Z3h4Z3h4Z3h4Z3h4Z3h4Z3h4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKMGpxxcaXGPlhm/giphy.gif" 
-                 class="max-broadcast" id="maxGif">
-            
-            <div class="vyleague-menu" id="menu">
-                <button class="btn" onclick="window.open('https://discord.com/invite/UYgZFUCe')">[ 01 ] VYLEAGUE_FILES</button>
-                <button class="btn" onclick="window.open('https://linktr.ee/yusufnaar.com')">[ 02 ] THE_OPERATOR</button>
-            </div>
+  <div class="cyber-grid" id="cyberGrid"></div>
+  <div class="global-scanlines"></div>
+
+  <div class="tv-wrapper">
+    <div class="tv-body" id="tvBody">
+
+```
+  <!-- SCREEN AREA -->
+  <div class="screen-bezel">
+    <div class="screen">
+      <div class="screen-inner" id="screenInner">
+
+        <!-- OFF STATE -->
+        <div class="screen-off" id="screenOff">
+          <span class="off-text">[ no signal ]</span>
         </div>
 
-        <div class="power-knob" onclick="toggleTV()"></div>
+        <!-- STATIC NOISE -->
+        <div class="static-layer" id="staticLayer"></div>
+
+        <!-- BROADCAST -->
+        <div class="broadcast-layer" id="broadcastLayer">
+          <div class="broadcast-bg"></div>
+          <img 
+            src="https://media.giphy.com/media/oEI9uWUPr8YN2/giphy.gif"
+            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.3) grayscale(0.3);mix-blend-mode:normal;z-index:3;"
+            alt="max headroom"
+          />
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:8px 10px;z-index:4;background:linear-gradient(transparent,rgba(0,0,0,0.8));">
+            <div class="max-subtitle">// illegal broadcast — vyleague //</div>
+          </div>
+        </div>
+
+        <!-- SCANLINES -->
+        <div class="scanlines-layer" id="scanlinesLayer"></div>
+
+        <!-- CHROMATIC ABERRATION -->
+        <div class="chromatic-layer" id="chromaticLayer"></div>
+
+        <!-- GLITCH OVERLAY -->
+        <div class="glitch-overlay" id="glitchOverlay">
+          <div class="glitch-bar"></div>
+        </div>
+
+        <!-- MENU -->
+        <div class="menu-overlay" id="menuOverlay">
+          <a class="menu-item" href="https://discord.com/invite/UYgZFUCe" target="_blank">
+            [ 01 ] VYLEAGUE_FILES → DC
+          </a>
+          <a class="menu-item" href="https://linktr.ee/yusufnaar.com" target="_blank">
+            [ 02 ] THE_OPERATOR → LINKTREE
+          </a>
+          <button class="menu-item" onclick="triggerGlitchMax()">
+            [ 03 ] CORE_VYLEAGUE → ???
+          </button>
+        </div>
+
+        <!-- CHANNEL TAG -->
+        <div class="channel-tag" id="channelTag">VL-CH.03</div>
+        <div class="signal-text" id="signalText">SIGNAL ACQUIRED — FREKUENSI AKTIF</div>
+
+      </div>
     </div>
+  </div>
 
-    <script>
-        let isOn = false;
-        function toggleTV() {
-            const noise = document.getElementById('noise');
-            const max = document.getElementById('maxGif');
-            const menu = document.getElementById('menu');
+  <!-- TV CONTROLS -->
+  <div class="tv-controls">
+    <div class="vyleague-label">VL</div>
+    <div class="control-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="power-knob" id="powerKnob" onclick="toggleTV()"></div>
+  </div>
 
-            if(!isOn) {
-                noise.style.opacity = '0.1';
-                max.style.display = 'block';
-                menu.style.display = 'flex';
-                isOn = true;
-            } else {
-                noise.style.opacity = '0.3';
-                max.style.display = 'none';
-                menu.style.display = 'none';
-                isOn = false;
-            }
+</div>
+```
+
+  </div>
+
+  <script>
+    let isOn = false;
+    let glitchInterval = null;
+
+    const tvBody = document.getElementById('tvBody');
+    const screenOff = document.getElementById('screenOff');
+    const staticLayer = document.getElementById('staticLayer');
+    const broadcastLayer = document.getElementById('broadcastLayer');
+    const scanlinesLayer = document.getElementById('scanlinesLayer');
+    const chromaticLayer = document.getElementById('chromaticLayer');
+    const glitchOverlay = document.getElementById('glitchOverlay');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const channelTag = document.getElementById('channelTag');
+    const signalText = document.getElementById('signalText');
+    const powerKnob = document.getElementById('powerKnob');
+    const cyberGrid = document.getElementById('cyberGrid');
+
+    function toggleTV() {
+      if (!isOn) {
+        powerOn();
+      } else {
+        powerOff();
+      }
+    }
+
+    function powerOn() {
+      isOn = true;
+      powerKnob.classList.add('on');
+      tvBody.classList.add('on');
+
+      // Static burst
+      staticLayer.style.opacity = '1';
+      screenOff.style.opacity = '0';
+
+      setTimeout(() => {
+        staticLayer.style.opacity = '0.4';
+
+        // Show broadcast
+        broadcastLayer.style.opacity = '1';
+        broadcastLayer.style.animation = 'startupGlitch 0.8s ease-out forwards';
+
+        // Activate layers
+        scanlinesLayer.style.opacity = '1';
+        chromaticLayer.style.opacity = '1';
+        cyberGrid.classList.add('active');
+
+        setTimeout(() => {
+          staticLayer.style.opacity = '0.08';
+
+          // Enable glitch
+          glitchOverlay.style.opacity = '1';
+          startGlitchLoop();
+
+          // Show menu & HUD
+          menuOverlay.classList.add('visible');
+          channelTag.style.opacity = '0.6';
+          signalText.style.opacity = '0.5';
+
+        }, 600);
+      }, 300);
+    }
+
+    function powerOff() {
+      isOn = false;
+      powerKnob.classList.remove('on');
+
+      // Glitch shutdown
+      staticLayer.style.opacity = '0.8';
+      menuOverlay.classList.remove('visible');
+      channelTag.style.opacity = '0';
+      signalText.style.opacity = '0';
+      glitchOverlay.style.opacity = '0';
+      stopGlitchLoop();
+
+      setTimeout(() => {
+        broadcastLayer.style.opacity = '0';
+        scanlinesLayer.style.opacity = '0';
+        chromaticLayer.style.opacity = '0';
+        cyberGrid.classList.remove('active');
+        tvBody.classList.remove('on');
+
+        setTimeout(() => {
+          staticLayer.style.opacity = '0';
+          screenOff.style.opacity = '1';
+        }, 300);
+      }, 400);
+    }
+
+    function startGlitchLoop() {
+      glitchInterval = setInterval(() => {
+        if (Math.random() > 0.7) {
+          triggerRandomGlitch();
         }
-    </script>
+      }, 2000);
+    }
+
+    function stopGlitchLoop() {
+      if (glitchInterval) clearInterval(glitchInterval);
+    }
+
+    function triggerRandomGlitch() {
+      const broadcast = document.querySelector('.max-head');
+      if (!broadcast) return;
+
+      const glitchDuration = 150 + Math.random() * 200;
+      const offsetX = (Math.random() - 0.5) * 8;
+
+      broadcast.style.transform = `translateX(${offsetX}px)`;
+      broadcast.style.textShadow = `${-offsetX}px 0 #ff0000, ${offsetX}px 0 #00ffff, 0 0 10px rgba(255,255,255,0.5)`;
+      staticLayer.style.opacity = '0.3';
+
+      setTimeout(() => {
+        broadcast.style.transform = '';
+        broadcast.style.textShadow = '';
+        staticLayer.style.opacity = '0.08';
+      }, glitchDuration);
+    }
+
+    function triggerGlitchMax() {
+      if (!isOn) return;
+
+      // Intense glitch sequence
+      staticLayer.style.opacity = '1';
+      glitchOverlay.style.opacity = '1';
+      menuOverlay.classList.remove('visible');
+
+      const glitchSeq = [100, 150, 80, 200, 120];
+      let delay = 0;
+
+      glitchSeq.forEach((duration, i) => {
+        setTimeout(() => {
+          staticLayer.style.opacity = Math.random() > 0.5 ? '1' : '0.2';
+          broadcastLayer.style.filter = i % 2 === 0 ?
+            'hue-rotate(180deg) invert(1) contrast(2)' :
+            'hue-rotate(0deg) invert(0) contrast(1)';
+        }, delay);
+        delay += duration;
+      });
+
+      setTimeout(() => {
+        staticLayer.style.opacity = '0.08';
+        broadcastLayer.style.filter = '';
+        menuOverlay.classList.add('visible');
+      }, delay + 200);
+    }
+  </script>
+
 </body>
 </html>
